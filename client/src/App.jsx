@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import { useState } from "react";
 import "./App.css";
 import Axios from "axios";
@@ -9,6 +10,7 @@ function App() {
   const [country, setCountry] = useState("");
   const [position, setPosition] = useState("");
   const [wage, setWage] = useState("");
+  const [newWage, setNewWage] = useState("");
 
   const [employeeList, setEmployeeList] = useState([]);
 
@@ -36,6 +38,34 @@ function App() {
         wage: wage
         }
       ])
+      })
+    }
+
+
+    const updateEmployeeWage = (id) => {
+      Axios.put('http://localhost:3001/update', { wage: newWage, id: id}).then((response) => {
+        setEmployeeList(
+          employeeList.map((val) => {
+            return val.id == id ? {
+              id: val.id,
+              name: val.name,
+              age: val.age,
+              country: val.country,
+              position: val.position,
+              wage: newWage
+            } : val;
+          })
+        )
+      })
+    }
+
+    const deleteEmployee = (id) => {
+      Axios.delete(`http://localhost:3001/delete/${id}`).then((response) => {
+        setEmployeeList(
+          employeeList.filter((val) => {
+            return val.id != id;
+          })
+        )
       })
     }
 
@@ -136,6 +166,14 @@ function App() {
                   <p className="card-text">Country: {val.country}</p>
                   <p className="card-text">Position: {val.position}</p>
                   <p className="card-text">Wage: {val.wage}</p>
+                  <div className="d-flex">
+                    <input type="number" className="form-control" style={{width: "300px"}}
+                    placeholder="...." onChange={(event) => {
+                      setNewWage(event.target.value)
+                    }} />
+                    <button className="btn btn-warning" onClick={() => { updateEmployeeWage(val.id) }}>Update</button>
+                    <button className="btn btn-danger" onClick={() => { deleteEmployee(val.id) }}>Delete</button>
+                  </div>
                 </div>
               </div>
             );
